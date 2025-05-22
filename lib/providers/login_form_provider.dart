@@ -24,4 +24,10 @@ class LoginFormProvider extends ChangeNotifier {
   bool isValidForm() {
     return formKey.currentState?.validate() ?? false;
   }
+
+  bool changePreferences(bool value) {
+    isChecked = value;
+    notifyListeners();
+    return isChecked;
+  }
 }

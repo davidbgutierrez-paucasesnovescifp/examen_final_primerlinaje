@@ -1,6 +1,8 @@
 import 'package:examen_final_primerlinaje/providers/providers.dart';
 import 'package:examen_final_primerlinaje/services/services.dart';
+import 'package:examen_final_primerlinaje/ui/input_decorations.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,9 +15,11 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => LoginFormProvider(),
-      child: _LoginForm(),
+    return Scaffold(
+      body: ChangeNotifierProvider(
+        create: (_) => LoginFormProvider(),
+        child: Container(padding: EdgeInsets.all(40), child: _LoginForm()),
+      ),
     );
   }
 }
@@ -27,14 +31,27 @@ class _LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final preferencesService = Provider.of<PreferencesService>(context);
     final loginForm = Provider.of<LoginFormProvider>(context);
+    final userPrefs = preferencesService.prefs?.getString("user");
+    final passPrefs = preferencesService.prefs?.getString("passPrefs");
+    print(userPrefs);
+    if (userPrefs != null && passPrefs != null) {
+      loginForm.email = userPrefs;
+      loginForm.password = passPrefs;
+    }
     return Form(
       key: loginForm.formKey,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           TextFormField(
             autocorrect: false,
             autovalidateMode: AutovalidateMode.onUnfocus,
             keyboardType: TextInputType.emailAddress,
+            decoration: InputDecorations.authInputDecoration(
+              hintText: 'john.doe@gmail.com',
+              labelText: 'Correu electrònic',
+              prefixIcon: Icons.alternate_email_outlined,
+            ),
             onChanged: (value) => loginForm.email = value,
             validator: (value) {
               if (value == null || value.isEmpty || value.length < 5) {
@@ -43,10 +60,16 @@ class _LoginForm extends StatelessWidget {
               return null;
             },
           ),
+          SizedBox(height: 30),
           TextFormField(
             autocorrect: false,
             autovalidateMode: AutovalidateMode.onUnfocus,
             keyboardType: TextInputType.visiblePassword,
+            decoration: InputDecorations.authInputDecoration(
+              hintText: '******',
+              labelText: 'Contrasenya',
+              prefixIcon: Icons.lock_outline,
+            ),
             onChanged: (value) => loginForm.password = value,
             validator: (value) {
               if (value == null || value.isEmpty || value.length < 8) {
@@ -55,6 +78,7 @@ class _LoginForm extends StatelessWidget {
               return null;
             },
           ),
+          SizedBox(height: 30),
           MaterialButton(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -70,12 +94,24 @@ class _LoginForm extends StatelessWidget {
 
                     if (loginForm.isValidForm()) {
                       loginForm.isLoading = true;
-                      loginForm.isLoading = false;
+
                       if (loginForm.error != false) {
                         // Limpiamos el form
                         loginForm.email = '';
                         loginForm.password = '';
                       }
+                      if (loginForm.isChecked) {
+                        await preferencesService.prefs?.setString(
+                          'user',
+                          loginForm.email,
+                        );
+                        await preferencesService.prefs?.setString(
+                          'password',
+                          loginForm.password,
+                        );
+                      }
+                      Navigator.pushNamed(context, "home");
+                      loginForm.isLoading = false;
                     }
                   },
             child: Container(
@@ -86,16 +122,22 @@ class _LoginForm extends StatelessWidget {
               ),
             ),
           ),
-          Checkbox(
-            checkColor: Colors.white,
-            value: loginForm.isChecked,
-            onChanged: (bool? value) {
-              if (value == null) {
-                loginForm.isChecked = false;
-              } else {
-                loginForm.isChecked = value;
-              }
-            },
+          SizedBox(height: 30),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Checkbox(
+                checkColor: Colors.white,
+                value: loginForm.isChecked,
+                onChanged: (value) {
+                  if (value != null) {
+                    loginForm.changePreferences(value);
+                  }
+                },
+              ),
+              Text("Recordar"),
+            ],
           ),
         ],
       ),
