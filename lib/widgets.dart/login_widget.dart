@@ -3,25 +3,8 @@ import 'package:examen_final_primerlinaje/services/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => LoginFormProvider(),
-      child: _LoginForm(),
-    );
-  }
-}
-
-class _LoginForm extends StatelessWidget {
-  const _LoginForm({super.key});
+class LoginWidget extends StatelessWidget {
+  const LoginWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
