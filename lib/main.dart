@@ -1,3 +1,4 @@
+import 'package:examen_final_primerlinaje/classes/sharedPrefs.dart';
 import 'package:examen_final_primerlinaje/providers/login_form_provider.dart';
 import 'package:examen_final_primerlinaje/services/preferences_service.dart';
 import 'package:examen_final_primerlinaje/services/users_service.dart';
@@ -5,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:examen_final_primerlinaje/screens/screens.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPrefs.init();
   runApp(AppState());
 }
 
@@ -15,10 +18,7 @@ class AppState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => (UsersService())),
-        ChangeNotifierProvider(create: (_) => (PreferencesService())),
-      ],
+      providers: [ChangeNotifierProvider(create: (_) => (UsersService()))],
       child: MainApp(),
     );
   }

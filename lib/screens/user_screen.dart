@@ -18,6 +18,7 @@ class UserScreen extends StatelessWidget {
           TextFormField(
             autocorrect: false,
             autovalidateMode: AutovalidateMode.onUnfocus,
+
             keyboardType: TextInputType.emailAddress,
             onChanged: (value) => loginForm.email = value,
             validator: (value) {

@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:examen_final_primerlinaje/classes/sharedPrefs.dart';
 import 'package:examen_final_primerlinaje/providers/providers.dart';
 import 'package:examen_final_primerlinaje/services/services.dart';
 import 'package:examen_final_primerlinaje/ui/input_decorations.dart';
@@ -29,15 +32,8 @@ class _LoginForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final preferencesService = Provider.of<PreferencesService>(context);
     final loginForm = Provider.of<LoginFormProvider>(context);
-    final userPrefs = preferencesService.prefs?.getString("user");
-    final passPrefs = preferencesService.prefs?.getString("passPrefs");
-    print(userPrefs);
-    if (userPrefs != null && passPrefs != null) {
-      loginForm.email = userPrefs;
-      loginForm.password = passPrefs;
-    }
+
     return Form(
       key: loginForm.formKey,
       child: Column(
@@ -47,6 +43,7 @@ class _LoginForm extends StatelessWidget {
             autocorrect: false,
             autovalidateMode: AutovalidateMode.onUnfocus,
             keyboardType: TextInputType.emailAddress,
+            initialValue: SharedPrefs.name,
             decoration: InputDecorations.authInputDecoration(
               hintText: 'john.doe@gmail.com',
               labelText: 'Correu electrònic',
@@ -65,6 +62,9 @@ class _LoginForm extends StatelessWidget {
             autocorrect: false,
             autovalidateMode: AutovalidateMode.onUnfocus,
             keyboardType: TextInputType.visiblePassword,
+            initialValue: SharedPrefs.password != ""
+                ? SharedPrefs.password
+                : null,
             decoration: InputDecorations.authInputDecoration(
               hintText: '******',
               labelText: 'Contrasenya',
@@ -101,14 +101,8 @@ class _LoginForm extends StatelessWidget {
                         loginForm.password = '';
                       }
                       if (loginForm.isChecked) {
-                        await preferencesService.prefs?.setString(
-                          'user',
-                          loginForm.email,
-                        );
-                        await preferencesService.prefs?.setString(
-                          'password',
-                          loginForm.password,
-                        );
+                        SharedPrefs.name = loginForm.email;
+                        SharedPrefs.password = loginForm.password;
                       }
                       Navigator.pushNamed(context, "home");
                       loginForm.isLoading = false;
